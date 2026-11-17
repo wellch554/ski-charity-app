@@ -1,12 +1,5 @@
-// Summary tab of the spreadsheet.
-//
-// STUB: only the result shape is declared so that costs.test.ts compiles.
-// The calculation is not implemented yet; its tests are skipped until it is.
-//
-// Why NaN instead of throwing: Vitest still runs the body of a describe.skip
-// block while collecting tests, and costs.test.ts calls calculateCosts() there.
-// A throw would fail the whole file. NaN is clearly "not a real number" and
-// would fail every assertion if the tests were un-skipped too early.
+// Summary tab of the spreadsheet. Pure function: no rounding here; round only
+// when displaying (see src/lib/formatCurrency.ts).
 import type { Assumptions } from "./defaults";
 
 export interface CostSummary {
@@ -40,32 +33,89 @@ export interface CostSummary {
   fundingGap: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function calculateCosts(_a: Assumptions): CostSummary {
+export function calculateCosts(a: Assumptions): CostSummary {
+  const kids = a.numberOfKids;
+  const kidDays = kids * a.skiDays;
+
+  // Variable costs
+  const liftTickets = kidDays * a.liftTicket;
+  const equipmentRental = kidDays * a.equipmentRental;
+  const food = kidDays * a.food;
+
+  // Spreadsheet quirk: a "kids per instructor" of 0 is treated as 1 (MAX(x,1)).
+  const instructorsNeeded = Math.ceil(kids / Math.max(a.kidsPerInstructor, 1));
+  const instructorCost = instructorsNeeded * a.instructorCostPerDay * a.skiDays;
+
+  // Volunteers ride the bus too, so with 0 kids we still book 1 bus
+  // (spreadsheet quirk). ASSUMED, not verified against the spreadsheet:
+  // a bus capacity of 0 is treated as 1, matching the instructor guard.
+  const busesNeeded = Math.ceil(
+    (kids + a.volunteers) / Math.max(a.busCapacity, 1),
+  );
+  const transportation = busesNeeded * a.busCharterPerDay * a.skiDays;
+
+  const loanerOuterwear = kids * a.loanerOuterwear;
+  const adaptiveTrack =
+    a.adaptiveParticipants *
+    (a.adaptiveLessonExtraPerDay + a.adaptiveEquipmentExtraPerDay) *
+    a.skiDays;
+
+  const totalVariable =
+    liftTickets +
+    equipmentRental +
+    food +
+    instructorCost +
+    transportation +
+    loanerOuterwear +
+    adaptiveTrack;
+
+  // Fixed costs
+  const coordinator = a.coordinatorStipend;
+  const insurance = a.insurance;
+  const backgroundChecks = a.volunteers * a.backgroundCheckPerVolunteer;
+  const marketing = a.marketing;
+  const totalFixed = coordinator + insurance + backgroundChecks + marketing;
+
+  // Totals. Per-child figures are 0 when there are no kids (spreadsheet guard).
+  // ASSUMED, not verified against the spreadsheet: costPerChildDay is also 0
+  // when skiDays is 0.
+  const subtotal = totalVariable + totalFixed;
+  const contingency = subtotal * a.contingencyRate;
+  const totalCost = subtotal + contingency;
+  const costPerChild = kids > 0 ? totalCost / kids : 0;
+  const costPerChildDay = kidDays > 0 ? totalCost / kidDays : 0;
+
+  // Funding and gap. A negative gap means a surplus.
+  const resortTicketDiscount = liftTickets * a.resortTicketDiscountRate;
+  const grantsSponsorsDonations =
+    a.grants + a.corporateSponsors + a.individualDonations;
+  const totalFunding = resortTicketDiscount + grantsSponsorsDonations;
+  const fundingGap = totalCost - totalFunding;
+
   return {
-    liftTickets: NaN,
-    equipmentRental: NaN,
-    food: NaN,
-    instructorsNeeded: NaN,
-    instructorCost: NaN,
-    busesNeeded: NaN,
-    transportation: NaN,
-    loanerOuterwear: NaN,
-    adaptiveTrack: NaN,
-    totalVariable: NaN,
-    coordinator: NaN,
-    insurance: NaN,
-    backgroundChecks: NaN,
-    marketing: NaN,
-    totalFixed: NaN,
-    subtotal: NaN,
-    contingency: NaN,
-    totalCost: NaN,
-    costPerChild: NaN,
-    costPerChildDay: NaN,
-    resortTicketDiscount: NaN,
-    grantsSponsorsDonations: NaN,
-    totalFunding: NaN,
-    fundingGap: NaN,
+    liftTickets,
+    equipmentRental,
+    food,
+    instructorsNeeded,
+    instructorCost,
+    busesNeeded,
+    transportation,
+    loanerOuterwear,
+    adaptiveTrack,
+    totalVariable,
+    coordinator,
+    insurance,
+    backgroundChecks,
+    marketing,
+    totalFixed,
+    subtotal,
+    contingency,
+    totalCost,
+    costPerChild,
+    costPerChildDay,
+    resortTicketDiscount,
+    grantsSponsorsDonations,
+    totalFunding,
+    fundingGap,
   };
 }

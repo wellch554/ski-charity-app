@@ -55,3 +55,5 @@ descriptions, keep changes small, and prefer clarity over cleverness.
 ## Known spreadsheet quirks (keep for now, revisit later)
 - With 0 kids, the model still books 1 bus because volunteers ride it.
 - "Kids per instructor" of 0 is treated as 1 (spreadsheet uses MAX(x,1)).
+- ASSUMED, not yet checked against the spreadsheet: bus capacity of 0 is treated
+  as 1, and cost per child-day is 0 when ski days is 0.
