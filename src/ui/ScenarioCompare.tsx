@@ -91,6 +91,7 @@ export function ScenarioCompare({
               <td key={s.id}>
                 <button
                   type="button"
+                  className="btn-small"
                   aria-label={`Load ${s.name}`}
                   onClick={() => onLoad(s)}
                 >
@@ -98,6 +99,7 @@ export function ScenarioCompare({
                 </button>
                 <button
                   type="button"
+                  className="btn-small"
                   aria-label={`Rename ${s.name}`}
                   onClick={() => setRenamingId(s.id)}
                 >
@@ -105,6 +107,7 @@ export function ScenarioCompare({
                 </button>
                 <button
                   type="button"
+                  className="btn-small btn-danger"
                   aria-label={`Delete ${s.name}`}
                   onClick={() => handleDelete(s)}
                 >
@@ -153,7 +156,9 @@ function RenameForm({ name, onSubmit, onCancel }: RenameProps) {
         aria-invalid={error !== null}
         aria-describedby={error ? errorId : undefined}
       />
-      <button type="submit">Save name</button>
+      <button type="submit" className="btn-primary">
+        Save name
+      </button>
       <button type="button" onClick={onCancel}>
         Cancel
       </button>

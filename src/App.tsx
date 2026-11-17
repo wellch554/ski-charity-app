@@ -15,7 +15,14 @@ function App() {
 
   return (
     <main>
-      <h1>Ski Program Cost Model</h1>
+      <header className="hero">
+        <p className="badge">Cost model</p>
+        <h1>Ski Program Cost Model</h1>
+        <p className="tagline">
+          Estimate the cost of getting kids on the slopes, and the funding gap
+          to close.
+        </p>
+      </header>
       <div className="layout">
         <CostSummary summary={summary} />
         <section aria-labelledby="assumptions-heading">
