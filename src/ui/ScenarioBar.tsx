@@ -34,10 +34,21 @@ export function ScenarioBar({ status, onSave, onSaveAs }: Props) {
 
   return (
     <div className="scenario-bar">
-      <p role="status" className="scenario-status">
+      <p
+        role="status"
+        className="scenario-status"
+        data-state={
+          status.kind === "none" ? "none" : status.edited ? "edited" : "loaded"
+        }
+      >
         {statusText}
       </p>
-      <button type="button" onClick={onSave} disabled={!canSave}>
+      <button
+        type="button"
+        className="btn-primary"
+        onClick={onSave}
+        disabled={!canSave}
+      >
         Save
       </button>
       <form className="save-as" onSubmit={handleSaveAs}>
@@ -50,7 +61,9 @@ export function ScenarioBar({ status, onSave, onSaveAs }: Props) {
           aria-invalid={error !== null}
           aria-describedby={error ? errorId : undefined}
         />
-        <button type="submit">Save as</button>
+        <button type="submit" className="btn-primary">
+          Save as
+        </button>
         {error && (
           <p id={errorId} className="field-error" role="alert">
             {error}
