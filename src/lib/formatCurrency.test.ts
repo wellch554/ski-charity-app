@@ -17,4 +17,11 @@ describe("formatCurrency", () => {
   it("shows negatives (e.g. a funding surplus) with a minus sign", () => {
     expect(formatCurrency(-18942)).toBe("-$18,942");
   });
+
+  it("does not show a minus sign on amounts that round to $0", () => {
+    // e.g. a funding gap that is really zero but comes out as a tiny
+    // negative float, because calculations are never rounded.
+    expect(formatCurrency(-0.4)).toBe("$0");
+    expect(formatCurrency(-1e-12)).toBe("$0");
+  });
 });
