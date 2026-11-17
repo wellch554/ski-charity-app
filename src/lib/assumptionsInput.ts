@@ -109,3 +109,9 @@ export function clearAssumptions(storage: KeyValueStorage) {
     // See saveAssumptions.
   }
 }
+
+// STUB: not implemented yet (tests first).
+export function sanitizeAssumptions(value: unknown): Assumptions {
+  void value;
+  throw new Error("not implemented");
+}

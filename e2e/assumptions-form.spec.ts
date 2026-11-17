@@ -9,6 +9,10 @@ test.beforeEach(async ({ page }) => {
   await page.reload();
 });
 
+// The scenario table also has a "Total cost" row, so look only in the summary.
+const summary = (page: Page) =>
+  page.getByRole("region", { name: "Cost summary" });
+
 const field = (page: Page, label: string) =>
   page.getByLabel(label, { exact: true });
 
@@ -18,7 +22,7 @@ async function expectSummary(
   perChild: string,
   gap: string,
 ) {
-  const row = (name: string) => page.getByRole("row", { name });
+  const row = (name: string) => summary(page).getByRole("row", { name });
   await expect(row("Total cost")).toContainText(total);
   await expect(row("Cost per child")).toContainText(perChild);
   await expect(row("Funding gap")).toContainText(gap);
@@ -48,20 +52,20 @@ test("kids 30", async ({ page }) => {
 test("kids 0 does not crash and shows $0 per child", async ({ page }) => {
   await field(page, "Number of kids").fill("0");
   // The bus is still booked for volunteers (spreadsheet quirk).
-  await expect(page.getByRole("row", { name: "Total cost" })).toContainText(
-    "$13,178",
-  );
-  await expect(page.getByRole("row", { name: "Cost per child" })).toContainText(
-    "$0",
-  );
+  await expect(
+    summary(page).getByRole("row", { name: "Total cost" }),
+  ).toContainText("$13,178");
+  await expect(
+    summary(page).getByRole("row", { name: "Cost per child" }),
+  ).toContainText("$0");
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
 
 test("contingency is entered as a percentage", async ({ page }) => {
   await field(page, "Contingency (%)").fill("20");
-  await expect(page.getByRole("row", { name: "Total cost" })).toContainText(
-    "$29,736",
-  );
+  await expect(
+    summary(page).getByRole("row", { name: "Total cost" }),
+  ).toContainText("$29,736");
 });
 
 test("values survive a page reload", async ({ page }) => {
