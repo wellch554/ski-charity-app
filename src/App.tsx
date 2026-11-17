@@ -1,32 +1,28 @@
 import { calculateCosts } from "./calc/costs";
-import { DEFAULT_ASSUMPTIONS } from "./calc/defaults";
-import { formatCurrency } from "./lib/formatCurrency";
-
-// Inputs are fixed defaults for now, so this is computed once. When the
-// Assumptions form arrives, it moves into the component and uses state.
-const summary = calculateCosts(DEFAULT_ASSUMPTIONS);
-
-const rows = [
-  { label: "Total cost", value: summary.totalCost },
-  { label: "Cost per child", value: summary.costPerChild },
-  { label: "Funding gap", value: summary.fundingGap },
-];
+import { AssumptionsForm } from "./ui/AssumptionsForm";
+import { CostSummary } from "./ui/CostSummary";
+import { useAssumptions } from "./ui/useAssumptions";
 
 function App() {
+  const { assumptions, setField, reset, resetCount } = useAssumptions();
+  // Cheap to compute, so it simply reruns on every render.
+  const summary = calculateCosts(assumptions);
+
   return (
     <main>
       <h1>Ski Program Cost Model</h1>
-      <h2>Cost summary</h2>
-      <table>
-        <tbody>
-          {rows.map(({ label, value }) => (
-            <tr key={label}>
-              <th scope="row">{label}</th>
-              <td>{formatCurrency(value)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="layout">
+        <CostSummary summary={summary} />
+        <section aria-labelledby="assumptions-heading">
+          <h2 id="assumptions-heading">Assumptions</h2>
+          <AssumptionsForm
+            key={resetCount}
+            assumptions={assumptions}
+            onChange={setField}
+            onReset={reset}
+          />
+        </section>
+      </div>
     </main>
   );
 }
