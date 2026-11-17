@@ -102,3 +102,95 @@ button {
   font: inherit;
   padding: 0.4rem 0.9rem;
 }
+
+/* --- Scenarios (issue #10) --- */
+
+.scenario-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background: #f4f6f8;
+  border-radius: 4px;
+}
+
+.scenario-status {
+  margin: 0;
+  font-weight: 600;
+}
+
+.save-as,
+.rename {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.save-as input,
+.rename input {
+  font: inherit;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid #999;
+  border-radius: 3px;
+  width: 9rem;
+}
+
+.save-as .field-error,
+.rename .field-error {
+  flex-basis: 100%;
+  text-align: left;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.compare {
+  border-collapse: collapse;
+  min-width: 100%;
+}
+
+.compare th,
+.compare td {
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+.compare thead th {
+  text-align: right;
+  vertical-align: bottom;
+}
+
+.compare tbody th {
+  text-align: left;
+  font-weight: normal;
+}
+
+.compare tbody td {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.compare .actions td {
+  border-bottom: none;
+}
+
+.compare .actions button {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.4rem;
+  margin-left: 0.25rem;
+}
+
+/* Hidden on screen but still read by screen readers (and Playwright). */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

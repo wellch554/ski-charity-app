@@ -9,6 +9,7 @@ import {
   loadAssumptions,
   parseField,
   percentToDecimal,
+  sanitizeAssumptions,
   saveAssumptions,
 } from "./assumptionsInput";
 
@@ -190,5 +191,19 @@ describe("saveAssumptions / clearAssumptions", () => {
       saveAssumptions(brokenStorage, DEFAULT_ASSUMPTIONS),
     ).not.toThrow();
     expect(() => clearAssumptions(brokenStorage)).not.toThrow();
+  });
+});
+
+describe("sanitizeAssumptions", () => {
+  it("merges valid fields over the defaults and drops the rest", () => {
+    expect(
+      sanitizeAssumptions({ numberOfKids: 30, volunteers: -1, extra: 1 }),
+    ).toEqual({ ...DEFAULT_ASSUMPTIONS, numberOfKids: 30 });
+  });
+
+  it("returns defaults for anything that isn't an object", () => {
+    for (const value of [null, 42, "text", [1, 2], undefined]) {
+      expect(sanitizeAssumptions(value)).toEqual(DEFAULT_ASSUMPTIONS);
+    }
   });
 });

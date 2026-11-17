@@ -67,31 +67,35 @@ export type KeyValueStorage = Pick<
 >;
 
 /**
- * Saved assumptions, merged over the defaults field by field. Anything
- * missing, unknown or invalid falls back to the default, so a corrupt or
- * outdated saved value can never break the page.
+ * Any value (e.g. parsed JSON) turned into valid Assumptions: valid fields
+ * are kept, anything missing, unknown or invalid falls back to the default.
+ * Used for the saved form inputs and for each saved scenario.
+ */
+export function sanitizeAssumptions(value: unknown): Assumptions {
+  const result = { ...DEFAULT_ASSUMPTIONS };
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return result;
+  }
+  const record = value as Record<string, unknown>;
+  for (const { key, kind } of ALL_FIELDS) {
+    const field = record[key];
+    if (isValidStoredValue(field, kind)) result[key] = field;
+  }
+  return result;
+}
+
+/**
+ * Saved assumptions, merged over the defaults field by field, so a corrupt
+ * or outdated saved value can never break the page.
  */
 export function loadAssumptions(storage: KeyValueStorage): Assumptions {
-  let saved: unknown;
   try {
     const raw = storage.getItem(STORAGE_KEY);
-    if (raw === null) return { ...DEFAULT_ASSUMPTIONS };
-    saved = JSON.parse(raw);
+    return sanitizeAssumptions(raw === null ? null : JSON.parse(raw));
   } catch {
     // Storage blocked (e.g. private mode) or corrupt JSON.
     return { ...DEFAULT_ASSUMPTIONS };
   }
-  if (typeof saved !== "object" || saved === null || Array.isArray(saved)) {
-    return { ...DEFAULT_ASSUMPTIONS };
-  }
-
-  const record = saved as Record<string, unknown>;
-  const result = { ...DEFAULT_ASSUMPTIONS };
-  for (const { key, kind } of ALL_FIELDS) {
-    const value = record[key];
-    if (isValidStoredValue(value, kind)) result[key] = value;
-  }
-  return result;
 }
 
 export function saveAssumptions(storage: KeyValueStorage, a: Assumptions) {
